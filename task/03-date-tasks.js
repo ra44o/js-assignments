@@ -22,7 +22,7 @@
  *    'Sun, 17 May 1998 03:00:00 GMT+01' => Date()
  */
 function parseDataFromRfc2822(value) {
-   throw new Error('Not implemented');
+  return new Date(value);
 }
 
 /**
@@ -37,7 +37,7 @@ function parseDataFromRfc2822(value) {
  *    '2016-01-19T08:07:37Z' => Date()
  */
 function parseDataFromIso8601(value) {
-   throw new Error('Not implemented');
+  return new Date(value);
 }
 
 
@@ -56,7 +56,18 @@ function parseDataFromIso8601(value) {
  *    Date(2015,1,1)    => false
  */
 function isLeapYear(date) {
-   throw new Error('Not implemented');
+  // const year = Number(date.toString().split(' ')[3]);
+  const year = date.getFullYear();
+  if (year % 4 !== 0) {
+    return false;
+  } else
+  if (year % 100 !== 0) {
+    return true;
+  } else 
+  if (year % 400 !== 0) {
+    return false;
+  }
+  return true;
 }
 
 
@@ -76,7 +87,31 @@ function isLeapYear(date) {
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,15,20,10,453)   => "05:20:10.453"
  */
 function timeSpanToString(startDate, endDate) {
-   throw new Error('Not implemented');
+  let difference = Math.abs(startDate - endDate);
+  let str = '';
+  function hourMinSec(param) {
+    if (param < 10) return `0${param}`;
+    return `${param}`;
+  }
+  function millisec(param) {
+    if (param > 10 && param < 100) {
+      return `0${param}`;
+    } else if (param < 10) {
+      return `00${param}`;
+    }
+    return `${param}`;
+  }
+  let variable =  Math.floor(difference / 3600000);
+  str += `${hourMinSec(variable)}:`;
+  difference -= variable * 3600000;
+  variable = Math.floor(difference / 60000);
+  str += `${hourMinSec(variable)}:`;
+  difference -= variable * 60000;
+  variable = Math.floor(difference / 1000);
+  difference -= variable * 1000;
+  str += `${hourMinSec(variable)}.${millisec(difference)}`;
+
+  return str;
 }
 
 
@@ -94,14 +129,22 @@ function timeSpanToString(startDate, endDate) {
  *    Date.UTC(2016,3,5,21, 0) => Math.PI/2
  */
 function angleBetweenClockHands(date) {
-    throw new Error('Not implemented');
+  const days = Math.floor(date / 86400000);
+	const hours = Math.floor((date - days * 86400000) / 3600000);
+  const minutes = Math.floor((date - days * 86400000 - hours * 3600000) / 60000);
+  let anglh = hours * 30 + minutes / 2;
+  let anglm = minutes * 6;
+  if (anglh >= 360) anglh -= 360;
+  if (anglh > 180) anglh -= 180;
+  if (anglm > 180) anglm -= 180;
+  return (Math.abs(anglh - anglm) / 10 * Math.PI / 18).toFixed(16);
 }
 
 
 module.exports = {
-    parseDataFromRfc2822: parseDataFromRfc2822,
-    parseDataFromIso8601: parseDataFromIso8601,
-    isLeapYear: isLeapYear,
-    timeSpanToString: timeSpanToString,
-    angleBetweenClockHands: angleBetweenClockHands
+  parseDataFromRfc2822: parseDataFromRfc2822,
+  parseDataFromIso8601: parseDataFromIso8601,
+  isLeapYear: isLeapYear,
+  timeSpanToString: timeSpanToString,
+  angleBetweenClockHands: angleBetweenClockHands
 };
